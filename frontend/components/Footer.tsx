@@ -1,25 +1,8 @@
-/**
- * Footer Component
- * Displays a fixed footer with social links and copyright information
- * @component
- * @version 1.0.0
- */
-
 import React from "react";
 import { Linkedin, Github, Mail, Copyright, Globe } from "lucide-react";
 
 const Footer = () => {
-  // ============================================================================
-  // CONSTANTS AND CONFIGURATIONS
-  // ============================================================================
-
-  // Get current year for copyright notice
   const currentYear = new Date().getFullYear();
-
-  /**
-   * Configuration for social media links and contact information
-   * Each object contains icon, URL, and label for accessibility
-   */
   const socialLinks = [
     {
       icon: Globe,
@@ -42,10 +25,6 @@ const Footer = () => {
       label: "Email"
     }
   ];
-
-  // ============================================================================
-  // RENDER
-  // ============================================================================
 
   return (
     <footer className="bg-white border-t border-gray-200 mt-auto">

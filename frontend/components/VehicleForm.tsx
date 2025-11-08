@@ -18,7 +18,7 @@ interface VehicleFormProps {
   }) => Promise<void>;
   onCancel: () => void;
   isSubmitting: boolean;
-  vehicles: Vehicle[]; // Added to pass for validation
+  vehicles: Vehicle[];
 }
 
 const statusOptions: { value: VehicleStatus; label: string }[] = [

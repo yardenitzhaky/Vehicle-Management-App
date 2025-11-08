@@ -8,4 +8,4 @@ export {
   canTransitionStatus,
   validateCreateVehicle,
   validateUpdateVehicle,
-} from '@shared/validations';
+} from '../../types/validations.ts';

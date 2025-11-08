@@ -1,15 +1,5 @@
-/**
- * CSV Export Utility
- * Provides functionality to export vehicle data to CSV format
- */
-
 import { Vehicle } from '@shared/index';
 
-/**
- * Converts an array of vehicles to CSV format
- * @param vehicles - Array of vehicle objects to convert
- * @returns CSV string with headers and data
- */
 export const convertToCSV = (vehicles: Vehicle[]): string => {
   if (vehicles.length === 0) {
     return 'id,licensePlate,status,createdAt\n';
@@ -23,9 +13,9 @@ export const convertToCSV = (vehicles: Vehicle[]): string => {
   const dataRows = vehicles.map((vehicle) => {
     return [
       vehicle.id,
-      `"${vehicle.licensePlate}"`, // Wrap in quotes to handle special characters
+      `"${vehicle.licensePlate}"`, 
       vehicle.status,
-      `"${vehicle.createdAt}"`, // Wrap in quotes for date format
+      `"${vehicle.createdAt}"`, 
     ].join(',');
   });
 
@@ -33,11 +23,7 @@ export const convertToCSV = (vehicles: Vehicle[]): string => {
   return [headerRow, ...dataRows].join('\n');
 };
 
-/**
- * Exports vehicles data as a downloadable CSV file
- * @param vehicles - Array of vehicle objects to export
- * @param filename - Optional custom filename (default: 'vehicles-export.csv')
- */
+
 export const exportToCSV = (
   vehicles: Vehicle[],
   filename: string = 'vehicles-export.csv'
@@ -65,10 +51,7 @@ export const exportToCSV = (
   URL.revokeObjectURL(url);
 };
 
-/**
- * Generates a filename with current timestamp
- * @returns Filename string with format: vehicles-YYYY-MM-DD-HHmmss.csv
- */
+
 export const generateTimestampedFilename = (): string => {
   const now = new Date();
   const year = now.getFullYear();
