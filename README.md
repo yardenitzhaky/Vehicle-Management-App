@@ -26,7 +26,7 @@
 1. **Clone the project**
    ```bash
    git clone "https://github.com/yardenitzhaky/Vehicle-Management-App.git"
-   cd 'optibus home assignment'
+   cd 'Vehicle-Management-App'
    ```
 
 2. **Install all dependencies**
