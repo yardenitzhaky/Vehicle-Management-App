@@ -1,0 +1,128 @@
+[
+  {
+    "id": "1",
+    "licensePlate": "ABC-123",
+    "status": "Available",
+    "createdAt": "2025-01-05T08:00:00.000Z"
+  },
+  {
+    "id": "2",
+    "licensePlate": "XYZ-789",
+    "status": "InUse",
+    "createdAt": "2025-01-10T09:30:00.000Z"
+  },
+  {
+    "id": "3",
+    "licensePlate": "DEF-456",
+    "status": "Available",
+    "createdAt": "2025-01-15T10:45:00.000Z"
+  },
+  {
+    "id": "4",
+    "licensePlate": "GHI-321",
+    "status": "Available",
+    "createdAt": "2025-01-20T11:00:00.000Z"
+  },
+  {
+    "id": "5",
+    "licensePlate": "JKL-654",
+    "status": "InUse",
+    "createdAt": "2025-01-25T14:15:00.000Z"
+  },
+  {
+    "id": "6",
+    "licensePlate": "MNO-987",
+    "status": "Available",
+    "createdAt": "2025-01-28T15:20:00.000Z"
+  },
+  {
+    "id": "7",
+    "licensePlate": "PQR-246",
+    "status": "Available",
+    "createdAt": "2025-02-01T08:45:00.000Z"
+  },
+  {
+    "id": "8",
+    "licensePlate": "STU-135",
+    "status": "InUse",
+    "createdAt": "2025-02-03T09:00:00.000Z"
+  },
+  {
+    "id": "9",
+    "licensePlate": "VWX-864",
+    "status": "Available",
+    "createdAt": "2025-02-05T10:30:00.000Z"
+  },
+  {
+    "id": "10",
+    "licensePlate": "YZA-753",
+    "status": "Available",
+    "createdAt": "2025-02-07T11:15:00.000Z"
+  },
+  {
+    "id": "11",
+    "licensePlate": "BCD-159",
+    "status": "InUse",
+    "createdAt": "2025-02-09T13:00:00.000Z"
+  },
+  {
+    "id": "12",
+    "licensePlate": "EFG-357",
+    "status": "Available",
+    "createdAt": "2025-02-11T14:20:00.000Z"
+  },
+  {
+    "id": "13",
+    "licensePlate": "HIJ-951",
+    "status": "Available",
+    "createdAt": "2025-02-13T15:45:00.000Z"
+  },
+  {
+    "id": "14",
+    "licensePlate": "KLM-852",
+    "status": "InUse",
+    "createdAt": "2025-02-15T16:30:00.000Z"
+  },
+  {
+    "id": "15",
+    "licensePlate": "NOP-741",
+    "status": "Available",
+    "createdAt": "2025-02-17T08:00:00.000Z"
+  },
+  {
+    "id": "16",
+    "licensePlate": "QRS-963",
+    "status": "Available",
+    "createdAt": "2025-02-19T09:15:00.000Z"
+  },
+  {
+    "id": "17",
+    "licensePlate": "TUV-258",
+    "status": "InUse",
+    "createdAt": "2025-02-21T10:00:00.000Z"
+  },
+  {
+    "id": "18",
+    "licensePlate": "WXY-147",
+    "status": "Available",
+    "createdAt": "2025-02-23T11:30:00.000Z"
+  },
+  {
+    "id": "19",
+    "licensePlate": "ABC-343",
+    "status": "InUse",
+    "createdAt": "2025-11-08T10:16:13.030Z"
+  },
+  {
+    "id": "20",
+    "licensePlate": "ABC-567",
+    "status": "InUse",
+    "createdAt": "2025-11-08T10:37:16.665Z"
+  },
+  {
+    "id": "21",
+    "licensePlate": "ABC-124",
+    "status": "Maintenance",
+    "createdAt": "2025-11-08T10:44:45.024Z"
+  }
+]
