@@ -48,9 +48,23 @@ app.get('/api/vehicles', asyncHandler(async (req: Request, res: Response) => {
 
   // Sort vehicles
   const sortedVehicles = [...vehicles].sort((a, b) => {
-    const aVal = a[sortBy as keyof Vehicle];
-    const bVal = b[sortBy as keyof Vehicle];
-    const cmp = aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+    const sortField = sortBy as keyof Vehicle;
+    const aVal = a[sortField];
+    const bVal = b[sortField];
+    let cmp = 0;
+
+    if (sortField === 'id') {
+      // Handle numeric sorting for IDs
+      cmp = parseInt(aVal, 10) - parseInt(bVal, 10);
+    } else if (sortField === 'createdAt') {
+      // Handle date sorting
+      cmp = new Date(aVal).getTime() - new Date(bVal).getTime();
+    } else {
+      // Handle string sorting for licensePlate, status, etc.
+      cmp = aVal.localeCompare(bVal);
+    }
+
+    // Apply sort order
     return sortOrder === 'desc' ? -cmp : cmp;
   });
 

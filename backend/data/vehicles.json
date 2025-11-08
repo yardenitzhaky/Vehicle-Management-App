@@ -102,12 +102,6 @@
     "createdAt": "2025-02-21T10:00:00.000Z"
   },
   {
-    "id": "18",
-    "licensePlate": "WXY-147",
-    "status": "Available",
-    "createdAt": "2025-02-23T11:30:00.000Z"
-  },
-  {
     "id": "19",
     "licensePlate": "ABC-343",
     "status": "Available",
@@ -122,7 +116,7 @@
   {
     "id": "21",
     "licensePlate": "ABC-124",
-    "status": "Maintenance",
+    "status": "Available",
     "createdAt": "2025-11-08T10:44:45.024Z"
   },
   {
@@ -148,5 +142,17 @@
     "licensePlate": "GYR-654",
     "status": "Available",
     "createdAt": "2025-11-08T13:42:34.584Z"
+  },
+  {
+    "id": "26",
+    "licensePlate": "GTC-545",
+    "status": "Maintenance",
+    "createdAt": "2025-11-08T15:24:16.539Z"
+  },
+  {
+    "id": "27",
+    "licensePlate": "GYT-765",
+    "status": "InUse",
+    "createdAt": "2025-11-08T15:28:34.982Z"
   }
 ]
