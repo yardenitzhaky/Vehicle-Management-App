@@ -48,7 +48,6 @@ This will start both the backend server (port 3001) and frontend (port 3000) con
 From the **frontend directory**:
 
 ```bash
-# Run all tests
 npm test
 ```
 
