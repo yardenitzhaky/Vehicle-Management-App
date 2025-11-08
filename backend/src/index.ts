@@ -228,7 +228,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-if (require.main === module) {
+if (import.meta.url === new URL(process.argv[1], import.meta.url).href) {
   app.listen(PORT, () => {
     console.log(`Backend server running on http://localhost:${PORT}`);
   });
