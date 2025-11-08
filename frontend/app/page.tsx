@@ -39,7 +39,7 @@ export default function Home() {
         sortOrder,
       });
 
-      const response = await fetch(`/api/vehicles?${params}`);
+      const response = await fetch(`${'http://localhost:3001'}/api/vehicles?${params}`);
       const result = await response.json();
 
       if (result.success) {
@@ -98,14 +98,14 @@ export default function Home() {
       let response;
       if (editingVehicle) {
         // Update existing vehicle
-        response = await fetch(`/api/vehicles/${editingVehicle.id}`, {
+        response = await fetch(`${'http://localhost:3001'}/api/vehicles/${editingVehicle.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
       } else {
         // Create new vehicle
-        response = await fetch('/api/vehicles', {
+        response = await fetch(`${'http://localhost:3001'}/api/vehicles`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
@@ -175,7 +175,7 @@ export default function Home() {
     const vehiclePlate = deletingVehicle.licensePlate;
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/vehicles/${deletingVehicle.id}`, {
+      const response = await fetch(`${'http://localhost:3001'}/api/vehicles/${deletingVehicle.id}`, {
         method: 'DELETE',
       });
 

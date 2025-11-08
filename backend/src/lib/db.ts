@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { Vehicle } from '@/types/vehicle';
 
-const DATA_FILE = path.join(process.cwd(), '..', 'vehicles.json');
+const DATA_FILE = path.join(__dirname, '../../data/vehicles.json');
 
 /**
  * Read all vehicles from the JSON file

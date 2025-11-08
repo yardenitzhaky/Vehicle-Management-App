@@ -1,6 +1,6 @@
 # Vehicle Management App
 
-A full-stack vehicle management application built with Next.js 14, TypeScript, and Tailwind CSS. This application allows users to manage a fleet of vehicles with complete CRUD functionality, status management, and advanced filtering capabilities.
+A full-stack vehicle management application built with Next.js 14, Express.js, TypeScript, and Tailwind CSS. This application allows users to manage a fleet of vehicles with complete CRUD functionality, status management, and advanced filtering capabilities.
 
 ## Features
 
@@ -28,12 +28,14 @@ A full-stack vehicle management application built with Next.js 14, TypeScript, a
 - **Next.js 14** with App Router
 - **TypeScript** for type safety
 - **Tailwind CSS** for styling
-- **React Server Components** and Client Components
+- **React** for UI components
+- **Framer Motion** for animations
 
 ### Backend
-- **Next.js API Routes** for RESTful endpoints
+- **Express.js** RESTful API server
+- **TypeScript** for type safety
 - **File-based persistence** using JSON storage
-- **Server-side validation** for data integrity
+- **CORS** enabled for cross-origin requests
 
 ### Testing
 - **Vitest** for unit tests
@@ -44,10 +46,22 @@ A full-stack vehicle management application built with Next.js 14, TypeScript, a
 
 ```
 /
+├── backend/                   # Express.js API server
+│   ├── src/
+│   │   ├── routes/           # API routes
+│   │   │   └── vehicles.ts   # Vehicle CRUD endpoints
+│   │   ├── lib/              # Utilities
+│   │   │   ├── db.ts         # Data persistence layer
+│   │   │   └── validations.ts # Business logic validation
+│   │   ├── types/            # TypeScript definitions
+│   │   │   └── vehicle.ts
+│   │   └── index.ts          # Server entry point
+│   ├── data/                 # Data storage
+│   │   └── vehicles.json
+│   ├── package.json
+│   └── tsconfig.json
 ├── frontend/                  # Next.js application
 │   ├── app/                   # App Router
-│   │   ├── api/              # API routes
-│   │   │   └── vehicles/     # Vehicle CRUD endpoints
 │   │   ├── layout.tsx        # Root layout
 │   │   ├── page.tsx          # Main vehicles page
 │   │   └── globals.css       # Global styles
@@ -56,14 +70,10 @@ A full-stack vehicle management application built with Next.js 14, TypeScript, a
 │   │   ├── VehicleForm.tsx
 │   │   ├── StatusBadge.tsx
 │   │   └── DeleteConfirmation.tsx
-│   ├── lib/                  # Utilities
-│   │   ├── validations.ts    # Business logic validation
-│   │   └── db.ts             # Data persistence layer
 │   ├── types/                # TypeScript definitions
 │   │   └── vehicle.ts
 │   ├── __tests__/            # Test files
 │   └── package.json
-├── vehicles.json             # Data storage
 └── README.md
 ```
 
@@ -80,14 +90,22 @@ A full-stack vehicle management application built with Next.js 14, TypeScript, a
    cd "optibus home assignment"
    ```
 
-2. **Install root dependencies**
+2. **Install all dependencies**
    ```bash
-   npm install
+   npm run install:all
    ```
 
-3. **Install frontend dependencies**
+   Or install manually:
    ```bash
-   cd frontend
+   # Install root dependencies
+   npm install
+
+   # Install backend dependencies
+   cd backend
+   npm install
+
+   # Install frontend dependencies
+   cd ../frontend
    npm install
    ```
 
@@ -100,18 +118,36 @@ From the **root directory**:
 npm run dev
 ```
 
-Or from the **frontend directory**:
+This will start both the backend server (port 3001) and frontend (port 3000) concurrently.
+
+Or run them separately:
+
+**Backend** (from backend directory):
+```bash
+cd backend
+npm run dev
+```
+The API server will start at [http://localhost:3001](http://localhost:3001)
+
+**Frontend** (from frontend directory):
 ```bash
 cd frontend
 npm run dev
 ```
-
 The application will start at [http://localhost:3000](http://localhost:3000)
 
 ### Production Build
 
 ```bash
+# Build both backend and frontend
 npm run build
+
+# Start backend
+cd backend
+npm start
+
+# Start frontend (in another terminal)
+cd frontend
 npm start
 ```
 
@@ -128,6 +164,9 @@ npm run test:coverage
 ```
 
 ## API Documentation
+
+### Base URL
+`http://localhost:3001`
 
 ### Endpoints
 
@@ -179,7 +218,7 @@ Create a new vehicle
 }
 ```
 
-#### PUT /api/vehicles/[id]
+#### PUT /api/vehicles/:id
 Update an existing vehicle
 
 **Request Body:**
@@ -203,7 +242,7 @@ Update an existing vehicle
 }
 ```
 
-#### DELETE /api/vehicles/[id]
+#### DELETE /api/vehicles/:id
 Delete a vehicle
 
 **Response:**
@@ -257,12 +296,25 @@ Maximum 5% of total fleet can be in Maintenance:
 
 ## Seed Data
 
-The application comes with 20 pre-populated vehicles in [vehicles.json](./vehicles.json):
+The application comes with 20 pre-populated vehicles in [backend/data/vehicles.json](./backend/data/vehicles.json):
 - 1 vehicle in Maintenance status
 - 6 vehicles in InUse status
 - 13 vehicles in Available status
 
 This data demonstrates all statuses and validation rules.
+
+## Environment Variables
+
+### Frontend (.env.local)
+```
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+### Backend
+No environment variables required for basic setup. Optionally you can set:
+```
+PORT=3001
+```
 
 ## Development Notes
 
