@@ -1,6 +1,4 @@
-# Vehicle Management App
-
-A full-stack vehicle management application built with Next.js 14, Express.js, TypeScript, and Tailwind CSS. This application allows users to manage a fleet of vehicles with complete CRUD functionality, status management, and advanced filtering capabilities.
+# Vehicle Management App - ReadMe + API Docs
 
 ### Frontend
 - **Next.js 14** 
