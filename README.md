@@ -3,22 +3,21 @@
 A full-stack vehicle management application built with Next.js 14, Express.js, TypeScript, and Tailwind CSS. This application allows users to manage a fleet of vehicles with complete CRUD functionality, status management, and advanced filtering capabilities.
 
 ### Frontend
-- **Next.js 14** with App Router
-- **TypeScript** for type safety
-- **Tailwind CSS** for styling
-- **React** for UI components
-- **Framer Motion** for animations
+- **Next.js 14** 
+- **TypeScript** 
+- **Tailwind CSS** 
+- **React** 
+- **Framer Motion** 
 
 ### Backend
-- **Express.js** RESTful API server
-- **TypeScript** for type safety
-- **File-based persistence** using JSON storage
-- **CORS** enabled for cross-origin requests
+- **Express.js** 
+- **TypeScript** 
+- **File-based persistence** 
+- **CORS** 
 
 ### Testing
-- **Vitest** for unit tests
-- **React Testing Library** for component tests
-- Comprehensive test coverage for validation logic
+- **Vitest** 
+- **React Testing Library** 
 
 ### Prerequisites
 - Node.js 18.x or higher
