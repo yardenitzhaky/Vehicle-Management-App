@@ -31,7 +31,7 @@
 
 2. **Install all dependencies**
    ```bash
-   npm install
+   npm run install:all
    ```
 
 ## Running the Application
