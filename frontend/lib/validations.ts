@@ -1,4 +1,11 @@
-import { VehicleStatus } from '@/types/vehicle';
+export type VehicleStatus = 'Available' | 'InUse' | 'Maintenance';
+
+export interface Vehicle {
+  id: string;
+  licensePlate: string;
+  status: VehicleStatus;
+  createdAt: string;
+}
 
 /**
  * Client-side validation for license plate format
@@ -56,9 +63,14 @@ export function canTransitionStatus(
  * Rule: Max 5% of total fleet can be in Maintenance simultaneously
  */
 export function canSetToMaintenance(
-  totalVehicles: number,
-  maintenanceCount: number
+  vehicles: Vehicle[],
+  vehicleId?: string
 ): { valid: boolean; error?: string } {
+  const totalVehicles = vehicles.length;
+  const maintenanceCount = vehicles.filter(
+    (v) => v.status === 'Maintenance' && v.id !== vehicleId
+  ).length;
+
   const maxMaintenance = Math.floor(totalVehicles * 0.05);
 
   if (maintenanceCount >= maxMaintenance) {
@@ -84,9 +96,127 @@ export function canDeleteVehicle(status: VehicleStatus): {
   if (status === 'InUse' || status === 'Maintenance') {
     return {
       valid: false,
-      error: `Vehicle cannot be deleted when it is ${status}`,
+      error: `Cannot delete vehicle when it is ${status}`,
     };
   }
 
   return { valid: true };
+}
+
+/**
+ * Client-side validation for license plate uniqueness
+ */
+export function isLicensePlateUnique(
+  licensePlate: string,
+  vehicles: Vehicle[],
+  vehicleId?: string
+): { valid: boolean; error?: string } {
+  const plateExists = vehicles.some(
+    (v) =>
+      v.licensePlate.toLowerCase() === licensePlate.toLowerCase() &&
+      v.id !== vehicleId
+  );
+
+  if (plateExists) {
+    return {
+      valid: false,
+      error: 'License plate already exists',
+    };
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Comprehensive validation for creating a new vehicle
+ */
+export function validateCreateVehicle(
+  licensePlate: string,
+  status: VehicleStatus,
+  vehicles: Vehicle[]
+): { field: 'licensePlate' | 'status'; message: string } | null {
+  const licensePlateValidation = validateLicensePlate(licensePlate);
+  if (!licensePlateValidation.valid) {
+    return {
+      field: 'licensePlate',
+      message: licensePlateValidation.error!,
+    };
+  }
+
+  const uniquenessValidation = isLicensePlateUnique(licensePlate, vehicles);
+  if (!uniquenessValidation.valid) {
+    return {
+      field: 'licensePlate',
+      message: uniquenessValidation.error!,
+    };
+  }
+
+  if (status === 'Maintenance') {
+    const maintenanceValidation = canSetToMaintenance(vehicles);
+    if (!maintenanceValidation.valid) {
+      return {
+        field: 'status',
+        message: maintenanceValidation.error!,
+      };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Comprehensive validation for updating an existing vehicle
+ */
+export function validateUpdateVehicle(
+  vehicleId: string,
+  currentVehicle: Vehicle,
+  updates: Partial<Vehicle>,
+  vehicles: Vehicle[]
+): { field: 'licensePlate' | 'status'; message: string } | null {
+  if (updates.licensePlate) {
+    const licensePlateValidation = validateLicensePlate(updates.licensePlate);
+    if (!licensePlateValidation.valid) {
+      return {
+        field: 'licensePlate',
+        message: licensePlateValidation.error!,
+      };
+    }
+
+    const uniquenessValidation = isLicensePlateUnique(
+      updates.licensePlate,
+      vehicles,
+      vehicleId
+    );
+    if (!uniquenessValidation.valid) {
+      return {
+        field: 'licensePlate',
+        message: uniquenessValidation.error!,
+      };
+    }
+  }
+
+  if (updates.status) {
+    const transitionValidation = canTransitionStatus(
+      currentVehicle.status,
+      updates.status
+    );
+if (!transitionValidation.valid) {
+      return {
+        field: 'status',
+        message: transitionValidation.error!,
+      };
+    }
+
+    if (updates.status === 'Maintenance') {
+      const maintenanceValidation = canSetToMaintenance(vehicles, vehicleId);
+      if (!maintenanceValidation.valid) {
+        return {
+          field: 'status',
+          message: maintenanceValidation.error!,
+        };
+      }
+    }
+  }
+
+  return null;
 }

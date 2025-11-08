@@ -1,17 +1,31 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Vehicle, VehicleStatus } from '@/types/vehicle';
+import { useState } from 'react';
+import { Vehicle, VehicleStatus } from '@/lib/validations';
 import VehicleTable from '@/components/VehicleTable';
 import VehicleForm from '@/components/VehicleForm';
 import DeleteConfirmation from '@/components/DeleteConfirmation';
 import { motion, AnimatePresence } from 'framer-motion';
-import toast from 'react-hot-toast';
+import { StatBox } from '@/components/StatBox';
+import { useVehicles } from '@/hooks/useVehicles';
 
 export default function Home() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const {
+    vehicles,
+    loading,
+    error,
+    statusFilter,
+    setStatusFilter,
+    searchTerm,
+    setSearchTerm,
+    sortBy,
+    sortOrder,
+    handleSort,
+    createVehicle,
+    updateVehicle,
+    deleteVehicle,
+    stats,
+  } = useVehicles();
 
   // Form state
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -22,51 +36,6 @@ export default function Home() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingVehicle, setDeletingVehicle] = useState<Vehicle | undefined>();
   const [isDeleting, setIsDeleting] = useState(false);
-
-  // Filter and search state
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('createdAt');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-
-  const fetchVehicles = useCallback(async () => {
-    try {
-      setLoading(true);
-      const params = new URLSearchParams({
-        ...(statusFilter !== 'all' && { status: statusFilter }),
-        ...(searchTerm && { search: searchTerm }),
-        sortBy,
-        sortOrder,
-      });
-
-      const response = await fetch(`${'http://localhost:3001'}/api/vehicles?${params}`);
-      const result = await response.json();
-
-      if (result.success) {
-        setVehicles(result.data);
-        setError('');
-      } else {
-        setError(result.error?.message || 'Failed to fetch vehicles');
-      }
-    } catch (err) {
-      setError('Failed to fetch vehicles');
-    } finally {
-      setLoading(false);
-    }
-  }, [statusFilter, searchTerm, sortBy, sortOrder]);
-
-  useEffect(() => {
-    fetchVehicles();
-  }, [fetchVehicles]);
-
-  const handleSort = (field: string) => {
-    if (sortBy === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(field);
-      setSortOrder('asc');
-    }
-  };
 
   const handleAddVehicle = () => {
     setEditingVehicle(undefined);
@@ -89,81 +58,17 @@ export default function Home() {
   }) => {
     setIsSubmitting(true);
     const isEditing = !!editingVehicle;
-    const previousData = editingVehicle ? {
-      licensePlate: editingVehicle.licensePlate,
-      status: editingVehicle.status,
-    } : null;
 
     try {
-      let response;
-      if (editingVehicle) {
-        // Update existing vehicle
-        response = await fetch(`${'http://localhost:3001'}/api/vehicles/${editingVehicle.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
-        });
+      if (isEditing && editingVehicle) {
+        await updateVehicle(editingVehicle.id, data);
       } else {
-        // Create new vehicle
-        response = await fetch(`${'http://localhost:3001'}/api/vehicles`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
-        });
+        await createVehicle(data);
       }
-
-      const result = await response.json();
-
-      if (result.success) {
-        setIsFormOpen(false);
-        setEditingVehicle(undefined);
-        fetchVehicles();
-
-        // Show success toast with animation
-        if (isEditing && previousData) {
-          const changes: string[] = [];
-          if (previousData.licensePlate !== data.licensePlate) {
-            changes.push(`License Plate: ${previousData.licensePlate} → ${data.licensePlate}`);
-          }
-          if (previousData.status !== data.status) {
-            changes.push(`Status: ${previousData.status} → ${data.status}`);
-          }
-
-          toast.success(
-            changes.length > 0
-              ? `Vehicle updated!\n${changes.join('\n')}`
-              : 'Vehicle updated successfully!',
-            {
-              duration: 4000,
-              style: {
-                background: '#10b981',
-                color: '#fff',
-                whiteSpace: 'pre-line',
-              },
-              iconTheme: {
-                primary: '#fff',
-                secondary: '#10b981',
-              },
-            }
-          );
-        } else {
-          toast.success(`Vehicle ${data.licensePlate} created successfully!`, {
-            duration: 4000,
-            style: {
-              background: '#10b981',
-              color: '#fff',
-            },
-            iconTheme: {
-              primary: '#fff',
-              secondary: '#10b981',
-            },
-          });
-        }
-      } else {
-        throw new Error(result.error?.message || 'Failed to save vehicle');
-      }
+      setIsFormOpen(false);
+      setEditingVehicle(undefined);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to save vehicle');
+      // Errors are already handled by the hook's toast notifications
     } finally {
       setIsSubmitting(false);
     }
@@ -172,45 +77,15 @@ export default function Home() {
   const handleConfirmDelete = async () => {
     if (!deletingVehicle) return;
 
-    const vehiclePlate = deletingVehicle.licensePlate;
     setIsDeleting(true);
     try {
-      const response = await fetch(`${'http://localhost:3001'}/api/vehicles/${deletingVehicle.id}`, {
-        method: 'DELETE',
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setDeleteConfirmOpen(false);
-        setDeletingVehicle(undefined);
-        fetchVehicles();
-        toast.success(`Vehicle ${vehiclePlate} deleted successfully!`, {
-          duration: 4000,
-          style: {
-            background: '#10b981',
-            color: '#fff',
-          },
-          iconTheme: {
-            primary: '#fff',
-            secondary: '#10b981',
-          },
-        });
-      } else {
-        toast.error(result.error?.message || 'Failed to delete vehicle');
-      }
-    } catch (err) {
-      toast.error('Failed to delete vehicle');
+      await deleteVehicle(deletingVehicle.id, deletingVehicle.licensePlate);
+      setDeleteConfirmOpen(false);
+      setDeletingVehicle(undefined);
+    } catch (err) { // Errors are already handled by the hook's toast notifications
     } finally {
       setIsDeleting(false);
     }
-  };
-
-  const stats = {
-    total: vehicles.length,
-    available: vehicles.filter((v) => v.status === 'Available').length,
-    inUse: vehicles.filter((v) => v.status === 'InUse').length,
-    maintenance: vehicles.filter((v) => v.status === 'Maintenance').length,
   };
 
   return (
@@ -226,13 +101,13 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="mb-8"
+          className="mb-8 text-center"
         >
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-secondary-500 animate-pulse">
             Vehicle Management
           </h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Manage your fleet of vehicles with ease
+          <p className="mt-2 text-lg text-gray-600">
+            Your fleet, at a glance.
           </p>
         </motion.div>
 
@@ -249,23 +124,13 @@ export default function Home() {
             { label: 'In Use', value: stats.inUse, color: 'text-blue-600' },
             { label: 'Maintenance', value: stats.maintenance, color: 'text-yellow-600' },
           ].map((stat, index) => (
-            <motion.div
+            <StatBox
               key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 + index * 0.1, duration: 0.4 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              className="bg-white overflow-hidden shadow rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-200"
-            >
-              <div className="px-4 py-5 sm:p-6">
-                <dt className="text-sm font-medium text-gray-500 truncate">
-                  {stat.label}
-                </dt>
-                <dd className={`mt-1 text-3xl font-semibold ${stat.color}`}>
-                  {stat.value}
-                </dd>
-              </div>
-            </motion.div>
+              label={stat.label}
+              value={stat.value}
+              color={stat.color}
+              index={index}
+            />
           ))}
         </motion.div>
 

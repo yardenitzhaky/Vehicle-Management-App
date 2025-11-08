@@ -1,6 +1,6 @@
 'use client';
 
-import { Vehicle } from '@/types/vehicle';
+import { Vehicle } from '@/lib/validations';
 import StatusBadge from './StatusBadge';
 import { canDeleteVehicle } from '@/lib/validations';
 

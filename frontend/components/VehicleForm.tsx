@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Vehicle, VehicleStatus } from '@/types/vehicle';
+import { Vehicle, VehicleStatus } from '@/lib/validations';
 import { canTransitionStatus, validateLicensePlate } from '@/lib/validations';
 
 interface VehicleFormProps {
@@ -69,16 +69,7 @@ export default function VehicleForm({
     }
   };
 
-  const getAvailableStatuses = () => {
-    if (!vehicle) return statusOptions;
 
-    return statusOptions.filter((option) => {
-      const validation = canTransitionStatus(vehicle.status, option.value);
-      return validation.valid;
-    });
-  };
-
-  const availableStatuses = getAvailableStatuses();
 
   if (!isOpen) return null;
 
@@ -123,8 +114,15 @@ export default function VehicleForm({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors duration-200 cursor-pointer"
                 disabled={isSubmitting}
               >
-                {availableStatuses.map((option) => (
-                  <option key={option.value} value={option.value}>
+                {statusOptions.map((option) => (
+                  <option
+                    key={option.value}
+                    value={option.value}
+                    disabled={
+                      !!vehicle &&
+                      !canTransitionStatus(vehicle.status, option.value).valid
+                    }
+                  >
                     {option.label}
                   </option>
                 ))}

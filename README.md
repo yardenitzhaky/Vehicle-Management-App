@@ -48,13 +48,9 @@ A full-stack vehicle management application built with Next.js 14, Express.js, T
 /
 ├── backend/                   # Express.js API server
 │   ├── src/
-│   │   ├── routes/           # API routes
-│   │   │   └── vehicles.ts   # Vehicle CRUD endpoints
-│   │   ├── lib/              # Utilities
-│   │   │   ├── db.ts         # Data persistence layer
-│   │   │   └── validations.ts # Business logic validation
-│   │   ├── types/            # TypeScript definitions
-│   │   │   └── vehicle.ts
+│   │   ├── db.ts         # Data persistence layer
+│   │   ├── validations.ts # Business logic validation
+│   │   ├── types.ts            # TypeScript definitions
 │   │   └── index.ts          # Server entry point
 │   ├── data/                 # Data storage
 │   │   └── vehicles.json
@@ -87,26 +83,12 @@ A full-stack vehicle management application built with Next.js 14, Express.js, T
 
 1. **Clone or download the project**
    ```bash
-   cd "optibus home assignment"
+   cd 'optibus home assignment'
    ```
 
 2. **Install all dependencies**
    ```bash
    npm run install:all
-   ```
-
-   Or install manually:
-   ```bash
-   # Install root dependencies
-   npm install
-
-   # Install backend dependencies
-   cd backend
-   npm install
-
-   # Install frontend dependencies
-   cd ../frontend
-   npm install
    ```
 
 ## Running the Application
@@ -119,22 +101,6 @@ npm run dev
 ```
 
 This will start both the backend server (port 3001) and frontend (port 3000) concurrently.
-
-Or run them separately:
-
-**Backend** (from backend directory):
-```bash
-cd backend
-npm run dev
-```
-The API server will start at [http://localhost:3001](http://localhost:3001)
-
-**Frontend** (from frontend directory):
-```bash
-cd frontend
-npm run dev
-```
-The application will start at [http://localhost:3000](http://localhost:3000)
 
 ### Production Build
 

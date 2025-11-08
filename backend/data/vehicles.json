@@ -110,13 +110,13 @@
   {
     "id": "19",
     "licensePlate": "ABC-343",
-    "status": "InUse",
+    "status": "Available",
     "createdAt": "2025-11-08T10:16:13.030Z"
   },
   {
     "id": "20",
     "licensePlate": "ABC-567",
-    "status": "InUse",
+    "status": "Available",
     "createdAt": "2025-11-08T10:37:16.665Z"
   },
   {
@@ -124,5 +124,23 @@
     "licensePlate": "ABC-124",
     "status": "Maintenance",
     "createdAt": "2025-11-08T10:44:45.024Z"
+  },
+  {
+    "id": "22",
+    "licensePlate": "ABC-524",
+    "status": "InUse",
+    "createdAt": "2025-11-08T11:49:36.926Z"
+  },
+  {
+    "id": "23",
+    "licensePlate": "ABC-542",
+    "status": "InUse",
+    "createdAt": "2025-11-08T12:11:59.397Z"
+  },
+  {
+    "id": "24",
+    "licensePlate": "GHI-789",
+    "status": "Available",
+    "createdAt": "2025-11-08T12:12:21.416Z"
   }
 ]

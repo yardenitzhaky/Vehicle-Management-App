@@ -8,7 +8,7 @@ import {
   validateCreateVehicle,
   validateUpdateVehicle,
 } from '../lib/validations';
-import { Vehicle } from '../types/vehicle';
+import { Vehicle } from '../lib/validations';
 
 describe('Validation Functions', () => {
   describe('canTransitionStatus', () => {
@@ -99,7 +99,7 @@ describe('Validation Functions', () => {
 
       const result = canSetToMaintenance(vehicles);
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('5% maintenance limit');
+      expect(result.error).toContain('of fleet) allowed in Maintenance');
     });
 
     it('should exclude current vehicle from maintenance count when updating', () => {
@@ -144,7 +144,7 @@ describe('Validation Functions', () => {
     it('should reject license plate shorter than 3 characters', () => {
       const result = validateLicensePlate('AB');
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('at least 3 characters');
+      expect(result.error).toContain('License plate must be in format XXX-NNN (3 capital letters, dash, 3 numbers)');
     });
   });
 
