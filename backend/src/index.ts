@@ -13,7 +13,7 @@ import {
 import { CreateVehicleDto, UpdateVehicleDto, Vehicle } from './types';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+export const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
@@ -43,23 +43,23 @@ app.get('/api/vehicles', async (req: Request, res: Response) => {
     }
 
     // Sort vehicles
-    vehicles.sort((a, b) => {
-      let aValue: string | number = a[sortBy as keyof Vehicle];
-      let bValue: string | number = b[sortBy as keyof Vehicle];
+    const sortedVehicles = [...vehicles].sort((a, b) => {
+      const aValue = a[sortBy as keyof Vehicle];
+      const bValue = b[sortBy as keyof Vehicle];
 
-      if (sortBy === 'createdAt') {
-        aValue = new Date(aValue).getTime();
-        bValue = new Date(bValue).getTime();
+      let comparison = 0;
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        comparison = aValue.localeCompare(bValue);
+      } else if (aValue > bValue) {
+        comparison = 1;
+      } else if (aValue < bValue) {
+        comparison = -1;
       }
 
-      if (sortOrder === 'asc') {
-        return aValue > bValue ? 1 : -1;
-      } else {
-        return aValue < bValue ? 1 : -1;
-      }
+      return sortOrder === 'desc' ? -comparison : comparison;
     });
 
-    res.json({ data: vehicles, success: true });
+    res.json({ data: sortedVehicles, success: true });
   } catch (error) {
     console.error('Error fetching vehicles:', error);
     res.status(500).json({
@@ -228,7 +228,10 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Backend server running on http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Backend server running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;
