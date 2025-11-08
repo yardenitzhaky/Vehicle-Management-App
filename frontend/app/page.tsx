@@ -240,6 +240,7 @@ export default function Home() {
           setEditingVehicle(undefined);
         }}
         isSubmitting={isSubmitting}
+        vehicles={vehicles} // Pass the vehicles array
       />
 
       {/* Delete Confirmation Modal */}

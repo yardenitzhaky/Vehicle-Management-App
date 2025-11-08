@@ -1,8 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Vehicle, VehicleStatus } from '@/lib/validations';
-import { canTransitionStatus, validateLicensePlate } from '@/lib/validations';
+import {
+  Vehicle,
+  VehicleStatus,
+  validateCreateVehicle,
+  validateUpdateVehicle,
+  canTransitionStatus,
+} from '@/lib/validations';
 
 interface VehicleFormProps {
   isOpen: boolean;
@@ -13,6 +18,7 @@ interface VehicleFormProps {
   }) => Promise<void>;
   onCancel: () => void;
   isSubmitting: boolean;
+  vehicles: Vehicle[]; // Added to pass for validation
 }
 
 const statusOptions: { value: VehicleStatus; label: string }[] = [
@@ -27,6 +33,7 @@ export default function VehicleForm({
   onSubmit,
   onCancel,
   isSubmitting,
+  vehicles,
 }: VehicleFormProps) {
   const [licensePlate, setLicensePlate] = useState('');
   const [status, setStatus] = useState<VehicleStatus>('Available');
@@ -47,29 +54,36 @@ export default function VehicleForm({
     e.preventDefault();
     setError('');
 
-    // Validate license plate format
-    const licensePlateValidation = validateLicensePlate(licensePlate.trim());
-    if (!licensePlateValidation.valid) {
-      setError(licensePlateValidation.error || 'Invalid license plate');
-      return;
-    }
+    let validationError = null;
 
     if (vehicle) {
-      const validation = canTransitionStatus(vehicle.status, status);
-      if (!validation.valid) {
-        setError(validation.error || 'Invalid status transition');
-        return;
-      }
+      // Editing existing vehicle
+      validationError = validateUpdateVehicle(
+        vehicle.id,
+        vehicle,
+        { licensePlate: licensePlate.trim(), status },
+        vehicles
+      );
+    } else {
+      // Creating new vehicle
+      validationError = validateCreateVehicle(
+        licensePlate.trim(),
+        status,
+        vehicles
+      );
+    }
+
+    if (validationError) {
+      setError(validationError.message);
+      return;
     }
 
     try {
       await onSubmit({ licensePlate: licensePlate.trim(), status });
-    } catch (err) {
-      setError('Failed to save vehicle');
+    } catch (err: any) {
+      setError(err.message || 'Failed to save vehicle');
     }
   };
-
-
 
   if (!isOpen) return null;
 

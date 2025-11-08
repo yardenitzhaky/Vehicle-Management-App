@@ -142,5 +142,11 @@
     "licensePlate": "GHI-789",
     "status": "Available",
     "createdAt": "2025-11-08T12:12:21.416Z"
+  },
+  {
+    "id": "25",
+    "licensePlate": "GYR-654",
+    "status": "Available",
+    "createdAt": "2025-11-08T13:42:34.584Z"
   }
 ]

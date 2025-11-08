@@ -102,7 +102,7 @@ Maintenance → Cannot Delete ❌
 ### Maintenance Limit Calculation
 ```typescript
 const maintenanceCount = vehicles.filter(v => v.status === 'Maintenance').length;
-const totalVehicles = vehicles.length;
+const totalVehicles = vehicles.length;i
 const maxMaintenance = Math.floor(totalVehicles * 0.05);
 const canAddToMaintenance = maintenanceCount < maxMaintenance;
 ```

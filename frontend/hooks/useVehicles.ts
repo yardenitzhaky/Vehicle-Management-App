@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Vehicle, VehicleStatus } from '@/lib/validations';
 import * as vehicleService from '@/services/vehicleService';
 import toast from 'react-hot-toast';
@@ -50,26 +50,12 @@ export const useVehicles = () => {
     licensePlate: string;
     status: VehicleStatus;
   }) => {
-    const tempId = `temp-${Date.now()}`;
-    const newVehicle: Vehicle = {
-      id: tempId,
-      ...data,
-      createdAt: new Date().toISOString(),
-    };
-
-    setVehicles((prev) => [newVehicle, ...prev]);
-
     try {
       const createdVehicle = await vehicleService.createVehicle(data);
-      setVehicles((prev) =>
-        prev.map((v) => (v.id === tempId ? createdVehicle : v))
-      );
+      setVehicles((prev) => [createdVehicle, ...prev]);
       toast.success(`Vehicle ${data.licensePlate} created successfully!`);
     } catch (err) {
-      setVehicles((prev) => prev.filter((v) => v.id !== tempId));
-      toast.error(
-        err instanceof Error ? err.message : 'Failed to create vehicle'
-      );
+      toast.error(err.message);
       throw err;
     }
   };
@@ -119,12 +105,16 @@ export const useVehicles = () => {
     }
   };
 
-  const stats = {
-    total: vehicles.length,
-    available: vehicles.filter((v) => v.status === 'Available').length,
-    inUse: vehicles.filter((v) => v.status === 'InUse').length,
-    maintenance: vehicles.filter((v) => v.status === 'Maintenance').length,
-  };
+  const confirmedVehicles = vehicles.filter((v) => !v.id.startsWith('temp-'));
+
+  const stats = useMemo(() => {
+    return {
+      total: confirmedVehicles.length,
+      available: confirmedVehicles.filter((v) => v.status === 'Available').length,
+      inUse: confirmedVehicles.filter((v) => v.status === 'InUse').length,
+      maintenance: confirmedVehicles.filter((v) => v.status === 'Maintenance').length,
+    };
+  }, [confirmedVehicles]);
 
   return {
     vehicles,
