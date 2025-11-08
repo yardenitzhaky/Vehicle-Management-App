@@ -105,16 +105,14 @@ export const useVehicles = () => {
     }
   };
 
-  const confirmedVehicles = vehicles.filter((v) => !v.id.startsWith('temp-'));
-
   const stats = useMemo(() => {
     return {
-      total: confirmedVehicles.length,
-      available: confirmedVehicles.filter((v) => v.status === 'Available').length,
-      inUse: confirmedVehicles.filter((v) => v.status === 'InUse').length,
-      maintenance: confirmedVehicles.filter((v) => v.status === 'Maintenance').length,
+      total: vehicles.length,
+      available: vehicles.filter((v) => v.status === 'Available').length,
+      inUse: vehicles.filter((v) => v.status === 'InUse').length,
+      maintenance: vehicles.filter((v) => v.status === 'Maintenance').length,
     };
-  }, [confirmedVehicles]);
+  }, [vehicles]);
 
   return {
     vehicles,

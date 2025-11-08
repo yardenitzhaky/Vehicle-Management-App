@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Vehicle, VehicleStatus } from '@shared/index';
 import {
+  Vehicle,
+  VehicleStatus,
   validateCreateVehicle,
   validateUpdateVehicle,
   canTransitionStatus,
-} from '@/lib/validations';
+} from '@shared/index';
 
 interface VehicleFormProps {
   isOpen: boolean;

@@ -1,8 +1,7 @@
 'use client';
 
-import { Vehicle } from '@shared/index';
+import { Vehicle, canDeleteVehicle } from '@shared/index';
 import StatusBadge from './StatusBadge';
-import { canDeleteVehicle } from '@/lib/validations';
 
 interface VehicleTableProps {
   vehicles: Vehicle[];

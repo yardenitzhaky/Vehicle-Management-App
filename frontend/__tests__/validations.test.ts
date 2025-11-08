@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  Vehicle,
   canTransitionStatus,
   canDeleteVehicle,
   canSetToMaintenance,
@@ -7,8 +8,7 @@ import {
   isLicensePlateUnique,
   validateCreateVehicle,
   validateUpdateVehicle,
-} from '../lib/validations';
-import { Vehicle } from '@shared/index';
+} from '@shared/index';
 
 describe('Validation Functions', () => {
   describe('canTransitionStatus', () => {
@@ -99,7 +99,7 @@ describe('Validation Functions', () => {
 
       const result = canSetToMaintenance(vehicles);
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('of fleet) allowed in Maintenance');
+      expect(result.error).toContain('Cannot exceed 5% maintenance limit');
     });
 
     it('should exclude current vehicle from maintenance count when updating', () => {
