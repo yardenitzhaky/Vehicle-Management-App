@@ -1,11 +1,4 @@
-export type VehicleStatus = 'Available' | 'InUse' | 'Maintenance';
-
-export interface Vehicle {
-  id: string;
-  licensePlate: string;
-  status: VehicleStatus;
-  createdAt: string;
-}
+import { Vehicle, VehicleStatus } from '@shared/index';
 
 /**
  * Client-side validation for license plate format

@@ -11,7 +11,7 @@ import {
   validateUpdateVehicle,
   canDeleteVehicle,
 } from '../src/validations';
-import { CreateVehicleDto, UpdateVehicleDto, Vehicle } from '../src/types';
+import { CreateVehicleDto, UpdateVehicleDto, Vehicle } from '@shared/index';
 
 // Mock the db module
 vi.mock('../src/db', async (importOriginal) => {
@@ -195,7 +195,7 @@ describe('Vehicle API', () => {
 
       expect(res.statusCode).toEqual(500);
       expect(res.body.success).toBe(false);
-      expect(res.body.error.message).toContain('Failed to fetch vehicles');
+      expect(res.body.error.message).toContain('DB read error');
     });
   });
 
@@ -313,7 +313,7 @@ describe('Vehicle API', () => {
 
       expect(res.statusCode).toEqual(500);
       expect(res.body.success).toBe(false);
-      expect(res.body.error.message).toContain('Failed to create vehicle');
+      expect(res.body.error.message).toContain('DB write error');
     });
   });
 
@@ -419,7 +419,7 @@ describe('Vehicle API', () => {
 
       expect(res.statusCode).toEqual(500);
       expect(res.body.success).toBe(false);
-      expect(res.body.error.message).toContain('Failed to update vehicle');
+      expect(res.body.error.message).toContain('DB write error');
     });
   });
 
@@ -498,7 +498,7 @@ describe('Vehicle API', () => {
 
       expect(res.statusCode).toEqual(500);
       expect(res.body.success).toBe(false);
-      expect(res.body.error.message).toContain('Failed to delete vehicle');
+      expect(res.body.error.message).toContain('DB write error');
     });
   });
 

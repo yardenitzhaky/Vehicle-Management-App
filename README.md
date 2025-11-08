@@ -28,6 +28,7 @@ A full-stack vehicle management application built with Next.js 14, Express.js, T
 
 1. **Clone or download the project**
    ```bash
+   git clone "https://github.com/yardenitzhaky/Vehicle-Management-App.git"
    cd 'optibus home assignment'
    ```
 

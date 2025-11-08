@@ -1,13 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { Vehicle, VehicleStatus } from '@/lib/validations';
+import { Vehicle, VehicleStatus } from '@shared/index';
 import VehicleTable from '@/components/VehicleTable';
 import VehicleForm from '@/components/VehicleForm';
 import DeleteConfirmation from '@/components/DeleteConfirmation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StatBox } from '@/components/StatBox';
 import { useVehicles } from '@/hooks/useVehicles';
+import { exportToCSV, generateTimestampedFilename } from '@/lib/csvExport';
+import { Download } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function Home() {
   const {
@@ -88,6 +91,22 @@ export default function Home() {
     }
   };
 
+  const handleExportToCSV = () => {
+    if (vehicles.length === 0) {
+      toast.error('No vehicles to export');
+      return;
+    }
+
+    try {
+      const filename = generateTimestampedFilename();
+      exportToCSV(vehicles, filename);
+      toast.success(`Exported ${vehicles.length} vehicle${vehicles.length !== 1 ? 's' : ''} to CSV`);
+    } catch (err) {
+      toast.error('Failed to export vehicles');
+      console.error('Export error:', err);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-gray-50 py-8">
       <motion.div
@@ -158,7 +177,16 @@ export default function Home() {
                 <option value="Maintenance">Maintenance</option>
               </select>
             </div>
-            <div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleExportToCSV}
+                disabled={vehicles.length === 0}
+                className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-md shadow-sm hover:bg-green-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 flex items-center justify-center transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-green-600"
+                title="Export to CSV"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Export CSV
+              </button>
               <button
                 onClick={handleAddVehicle}
                 className="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white rounded-md shadow-sm hover:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 flex items-center justify-center transition-all duration-200 transform hover:scale-105"

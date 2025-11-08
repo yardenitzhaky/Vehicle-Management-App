@@ -1,5 +1,5 @@
 
-import { Vehicle, VehicleStatus } from '@/lib/validations';
+import { Vehicle, VehicleStatus } from '@shared/index';
 
 const API_URL = 'http://localhost:3001/api';
 

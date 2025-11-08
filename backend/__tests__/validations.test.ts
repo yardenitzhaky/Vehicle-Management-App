@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import {
-  canTransitionStatus,
   canDeleteVehicle,
   canSetToMaintenance,
   validateLicensePlate,
@@ -8,47 +7,9 @@ import {
   validateCreateVehicle,
   validateUpdateVehicle,
 } from '../src/validations';
-import { Vehicle } from '../src/types';
+import { Vehicle } from '@shared/index';
 
 describe('Validation Functions', () => {
-  describe('canTransitionStatus', () => {
-    it('should allow Available -> InUse transition', () => {
-      const result = canTransitionStatus('Available', 'InUse');
-      expect(result.valid).toBe(true);
-    });
-
-    it('should allow Available -> Maintenance transition', () => {
-      const result = canTransitionStatus('Available', 'Maintenance');
-      expect(result.valid).toBe(true);
-    });
-
-    it('should allow InUse -> Available transition', () => {
-      const result = canTransitionStatus('InUse', 'Available');
-      expect(result.valid).toBe(true);
-    });
-
-    it('should allow InUse -> Maintenance transition', () => {
-      const result = canTransitionStatus('InUse', 'Maintenance');
-      expect(result.valid).toBe(true);
-    });
-
-    it('should allow Maintenance -> Available transition', () => {
-      const result = canTransitionStatus('Maintenance', 'Available');
-      expect(result.valid).toBe(true);
-    });
-
-    it('should NOT allow Maintenance -> InUse transition', () => {
-      const result = canTransitionStatus('Maintenance', 'InUse');
-      expect(result.valid).toBe(false);
-      expect(result.error).toContain('A vehicle in Maintenance can only be set to Available');
-    });
-
-    it('should allow same status (no transition)', () => {
-      const result = canTransitionStatus('Available', 'Available');
-      expect(result.valid).toBe(true);
-    });
-  });
-
   describe('canDeleteVehicle', () => {
     it('should allow deletion of Available vehicles', () => {
       const result = canDeleteVehicle('Available');

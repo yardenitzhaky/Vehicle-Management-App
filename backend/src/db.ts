@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { Vehicle } from './types';
+import { Vehicle } from '@shared/index';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,7 +39,7 @@ export async function writeVehicles(vehicles: Vehicle[]): Promise<void> {
 export function generateId(vehicles: Vehicle[]): string {
   const maxId = vehicles.reduce((max, vehicle) => {
     const id = parseInt(vehicle.id, 10);
-    return id > max ? id : max;
+    return !isNaN(id) && id > max ? id : max;
   }, 0);
   return (maxId + 1).toString();
 }

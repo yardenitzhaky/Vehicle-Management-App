@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Vehicle, VehicleStatus } from '@/lib/validations';
+import { Vehicle, VehicleStatus } from '@shared/index';
 import * as vehicleService from '@/services/vehicleService';
 import toast from 'react-hot-toast';
 
@@ -55,7 +55,7 @@ export const useVehicles = () => {
       setVehicles((prev) => [createdVehicle, ...prev]);
       toast.success(`Vehicle ${data.licensePlate} created successfully!`);
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err instanceof Error ? err.message : 'Failed to create vehicle');
       throw err;
     }
   };

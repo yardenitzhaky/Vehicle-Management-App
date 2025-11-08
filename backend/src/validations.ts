@@ -1,27 +1,8 @@
-import { Vehicle, VehicleStatus, ValidationError } from './types';
+import { Vehicle, VehicleStatus, ValidationError } from '@shared/index';
 
-/**
- * Validates if a vehicle can transition from one status to another
- * Rule: A vehicle in Maintenance can ONLY transition to Available (not to InUse)
- */
-export function canTransitionStatus(
-  currentStatus: VehicleStatus,
-  newStatus: VehicleStatus
-): { valid: boolean; error?: string } {
-  if (currentStatus === newStatus) {
-    return { valid: true };
-  }
+// Constants
+const MAINTENANCE_LIMIT_PERCENTAGE = 0.05;
 
-  // Maintenance can only go to Available
-  if (currentStatus === 'Maintenance' && newStatus !== 'Available') {
-    return {
-      valid: false,
-      error: 'A vehicle in Maintenance can only be set to Available',
-    };
-  }
-
-  return { valid: true };
-}
 
 /**
  * Validates if a vehicle can be deleted
@@ -54,7 +35,7 @@ export function canSetToMaintenance(
     (v) => v.status === 'Maintenance' && v.id !== currentVehicleId
   ).length;
 
-  const maxMaintenance = Math.floor(totalVehicles * 0.05);
+  const maxMaintenance = Math.floor(totalVehicles * MAINTENANCE_LIMIT_PERCENTAGE);
 
   if (maintenanceCount >= maxMaintenance) {
     return {
@@ -191,14 +172,11 @@ export function validateUpdateVehicle(
 
   // Validate status transition if status is being updated
   if (updates.status !== undefined) {
-    const transitionValidation = canTransitionStatus(
-      currentVehicle.status,
-      updates.status
-    );
-    if (!transitionValidation.valid) {
+    // Rule: Maintenance can only transition to Available
+    if (currentVehicle.status === 'Maintenance' && updates.status !== 'Available' && currentVehicle.status !== updates.status) {
       return {
         field: 'status',
-        message: transitionValidation.error!,
+        message: 'A vehicle in Maintenance can only be set to Available',
       };
     }
 

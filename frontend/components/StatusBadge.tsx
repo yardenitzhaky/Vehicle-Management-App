@@ -1,6 +1,6 @@
 'use client';
 
-import { VehicleStatus } from '@/lib/validations';
+import { VehicleStatus } from '@shared/index';
 
 interface StatusBadgeProps {
   status: VehicleStatus;

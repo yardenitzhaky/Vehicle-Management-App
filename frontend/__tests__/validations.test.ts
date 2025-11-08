@@ -8,7 +8,7 @@ import {
   validateCreateVehicle,
   validateUpdateVehicle,
 } from '../lib/validations';
-import { Vehicle } from '../lib/validations';
+import { Vehicle } from '@shared/index';
 
 describe('Validation Functions', () => {
   describe('canTransitionStatus', () => {
