@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Vehicle, VehicleStatus } from '@shared/index';
+import { Vehicle, VehicleStatus, ApiResponse } from '@shared/index';
 import * as vehicleService from '@/services/vehicleService';
 import toast from 'react-hot-toast';
 
@@ -46,16 +46,61 @@ export const useVehicles = () => {
     }
   };
 
-  const createVehicle = async (data: {
-    licensePlate: string;
-    status: VehicleStatus;
-  }) => {
+  const createVehicles = async (
+    data:
+      | { licensePlate: string; status: VehicleStatus }
+      | Array<{ licensePlate: string; status?: VehicleStatus }>
+  ): Promise<Vehicle | ApiResponse<Vehicle[]>> => {
     try {
-      const createdVehicle = await vehicleService.createVehicle(data);
-      setVehicles((prev) => [createdVehicle, ...prev]);
-      toast.success(`Vehicle ${data.licensePlate} created successfully!`);
+      const result = await vehicleService.createVehicles(data);
+
+      // Handle single vehicle creation
+      if (!Array.isArray(data)) {
+        const createdVehicle = result as Vehicle;
+        setVehicles((prev) => [createdVehicle, ...prev]);
+        toast.success(`Vehicle ${data.licensePlate} created successfully!`);
+        return createdVehicle;
+      }
+
+      // Handle batch creation
+      const batchResult = result as ApiResponse<Vehicle[]>;
+
+      // Add successfully created vehicles to the state
+      const successfulVehicles = batchResult.results
+        ?.filter((r) => r.success && r.vehicle)
+        .map((r) => r.vehicle!) || [];
+
+      if (successfulVehicles.length > 0) {
+        setVehicles((prev) => [...successfulVehicles, ...prev]);
+      }
+
+      // Show appropriate toast messages
+      const successCount = batchResult.successCount || 0;
+      const failureCount = batchResult.failureCount || 0;
+
+      if (successCount > 0 && failureCount === 0) {
+        toast.success(
+          `Successfully created ${successCount} vehicle${
+            successCount !== 1 ? 's' : ''
+          }!`
+        );
+      } else if (successCount > 0 && failureCount > 0) {
+        toast.success(
+          `Created ${successCount} vehicle${
+            successCount !== 1 ? 's' : ''
+          }. ${failureCount} failed.`,
+          { duration: 4000 }
+        );
+      } else {
+        toast.error(`Failed to create all ${failureCount} vehicles`);
+      }
+
+      return batchResult;
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to create vehicle');
+      const errorMessage = Array.isArray(data)
+        ? 'Failed to create vehicles'
+        : 'Failed to create vehicle';
+      toast.error(err instanceof Error ? err.message : errorMessage);
       throw err;
     }
   };
@@ -125,7 +170,7 @@ export const useVehicles = () => {
     sortBy,
     sortOrder,
     handleSort,
-    createVehicle,
+    createVehicles,
     updateVehicle,
     deleteVehicle,
     stats,

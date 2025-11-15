@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import {
   Vehicle,
   VehicleStatus,
-  validateCreateVehicle,
+  validateCreateVehicles,
   validateUpdateVehicle,
   canTransitionStatus,
 } from '@shared/index';
@@ -66,11 +66,10 @@ export default function VehicleForm({
       );
     } else {
       // Creating new vehicle
-      validationError = validateCreateVehicle(
-        licensePlate.trim(),
-        status,
+      validationError = validateCreateVehicles(
+        { licensePlate: licensePlate.trim(), status },
         vehicles
-      );
+      ) as any;
     }
 
     if (validationError) {

@@ -3,14 +3,21 @@ import cors from 'cors';
 import {
   readVehicles,
   writeVehicles,
-  generateId,
+  generateIds,
 } from './db';
 import {
-  validateCreateVehicle,
+  validateCreateVehicles,
   validateUpdateVehicle,
   canDeleteVehicle,
 } from './validations';
-import { CreateVehicleDto, UpdateVehicleDto, Vehicle } from '@shared/index';
+import {
+  CreateVehicleDto,
+  UpdateVehicleDto,
+  Vehicle,
+  BatchVehicleResult,
+  ApiResponse,
+  ValidationError,
+} from '@shared/index';
 
 const app = express();
 export const PORT = process.env.PORT || 3001;
@@ -73,20 +80,104 @@ app.get('/api/vehicles', asyncHandler(async (req: Request, res: Response) => {
 
 /**
  * POST /api/vehicles
- * Creates a new vehicle
+ * Creates one or more vehicles
  */
 app.post('/api/vehicles', asyncHandler(async (req: Request, res: Response) => {
   const body: CreateVehicleDto = req.body;
-  const { licensePlate, status = 'Available' } = body;
+  const { licensePlate, status = 'Available', vehicles: vehiclesToCreate } = body;
 
-  const vehicles = await readVehicles();
+  const existingVehicles = await readVehicles();
+  const createdAt = new Date().toISOString();
+
+  // Handle batch creation
+  if (vehiclesToCreate && Array.isArray(vehiclesToCreate)) {
+    if (vehiclesToCreate.length === 0) {
+      return res.status(400).json({
+        error: { message: 'Invalid request: vehicles array cannot be empty' },
+        success: false,
+      });
+    }
+
+    // Validate all vehicles in the batch
+    const validationResults = validateCreateVehicles(
+      vehiclesToCreate,
+      existingVehicles
+    ) as Array<ValidationError | null>;
+
+    // Prepare results array
+    const results: BatchVehicleResult[] = [];
+    const successfulVehicles: Vehicle[] = [];
+    const newIds = generateIds(existingVehicles, vehiclesToCreate.length) as string[];
+
+    // Process each vehicle
+    vehiclesToCreate.forEach((vehicleDto, index) => {
+      const validationError = validationResults[index];
+
+      if (validationError) {
+        // This vehicle failed validation
+        results.push({
+          error: validationError,
+          success: false,
+          index,
+        });
+      } else {
+        // This vehicle passed validation
+        const newVehicle: Vehicle = {
+          id: newIds[index],
+          licensePlate: vehicleDto.licensePlate.trim(),
+          status: vehicleDto.status || 'Available',
+          createdAt,
+        };
+
+        successfulVehicles.push(newVehicle);
+        results.push({
+          vehicle: newVehicle,
+          success: true,
+          index,
+        });
+      }
+    });
+
+    // Save only the successful vehicles
+    if (successfulVehicles.length > 0) {
+      const updatedVehicles = [...existingVehicles, ...successfulVehicles];
+      await writeVehicles(updatedVehicles);
+    }
+
+    const response: ApiResponse<Vehicle[]> = {
+      data: successfulVehicles,
+      results,
+      successCount: successfulVehicles.length,
+      failureCount: vehiclesToCreate.length - successfulVehicles.length,
+      success: successfulVehicles.length > 0,
+    };
+
+    // Return 207 Multi-Status if some succeeded and some failed
+    // Return 201 if all succeeded
+    // Return 400 if all failed
+    const statusCode =
+      successfulVehicles.length === vehiclesToCreate.length
+        ? 201
+        : successfulVehicles.length > 0
+        ? 207
+        : 400;
+
+    return res.status(statusCode).json(response);
+  }
+
+  // Handle single vehicle creation
+  if (!licensePlate) {
+    return res.status(400).json({
+      error: { message: 'License plate is required' },
+      success: false,
+    });
+  }
 
   // Validate the new vehicle
-  const validationError = validateCreateVehicle(
-    licensePlate,
-    status,
-    vehicles
-  );
+  const validationError = validateCreateVehicles(
+    { licensePlate, status },
+    existingVehicles
+  ) as ValidationError | null;
 
   if (validationError) {
     return res.status(400).json({
@@ -97,14 +188,14 @@ app.post('/api/vehicles', asyncHandler(async (req: Request, res: Response) => {
 
   // Create new vehicle
   const newVehicle: Vehicle = {
-    id: generateId(vehicles),
+    id: generateIds(existingVehicles) as string,
     licensePlate: licensePlate.trim(),
     status,
-    createdAt: new Date().toISOString(),
+    createdAt,
   };
 
-  vehicles.push(newVehicle);
-  await writeVehicles(vehicles);
+  existingVehicles.push(newVehicle);
+  await writeVehicles(existingVehicles);
 
   res.status(201).json({
     data: newVehicle,

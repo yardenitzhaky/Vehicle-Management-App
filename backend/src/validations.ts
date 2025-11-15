@@ -6,6 +6,6 @@ export {
   validateLicensePlate,
   isLicensePlateUnique,
   canTransitionStatus,
-  validateCreateVehicle,
+  validateCreateVehicles,
   validateUpdateVehicle,
-} from '../../types/validations.ts';
+} from '../../types/validations';

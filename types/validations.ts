@@ -121,43 +121,121 @@ export function canTransitionStatus(
 }
 
 /**
- * Comprehensive validation for creating a vehicle
+ * Comprehensive validation for creating vehicle(s)
+ * Supports both single vehicle and batch creation
+ * @param vehiclesToCreate - Single vehicle or array of vehicles to create
+ * @param existingVehicles - Existing vehicles array
+ * @returns Single ValidationError or array of ValidationErrors (null if valid)
  */
-export function validateCreateVehicle(
-  licensePlate: string,
-  status: VehicleStatus,
-  allVehicles: Vehicle[]
-): ValidationError | null {
-  // Validate license plate format
-  const licensePlateValidation = validateLicensePlate(licensePlate);
-  if (!licensePlateValidation.valid) {
-    return {
-      field: 'licensePlate',
-      message: licensePlateValidation.error!,
-    };
-  }
+export function validateCreateVehicles(
+  vehiclesToCreate:
+    | { licensePlate: string; status?: VehicleStatus }
+    | Array<{ licensePlate: string; status?: VehicleStatus }>,
+  existingVehicles: Vehicle[]
+): ValidationError | null | Array<ValidationError | null> {
+  // Handle single vehicle creation
+  if (!Array.isArray(vehiclesToCreate)) {
+    const { licensePlate, status = 'Available' } = vehiclesToCreate;
 
-  // Check uniqueness
-  const uniqueValidation = isLicensePlateUnique(licensePlate, allVehicles);
-  if (!uniqueValidation.valid) {
-    return {
-      field: 'licensePlate',
-      message: uniqueValidation.error!,
-    };
-  }
-
-  // Check maintenance limit if creating with Maintenance status
-  if (status === 'Maintenance') {
-    const maintenanceValidation = canSetToMaintenance(allVehicles);
-    if (!maintenanceValidation.valid) {
+    // Validate license plate format
+    const licensePlateValidation = validateLicensePlate(licensePlate);
+    if (!licensePlateValidation.valid) {
       return {
-        field: 'status',
-        message: maintenanceValidation.error!,
+        field: 'licensePlate',
+        message: licensePlateValidation.error!,
       };
     }
+
+    // Check uniqueness
+    const uniqueValidation = isLicensePlateUnique(licensePlate, existingVehicles);
+    if (!uniqueValidation.valid) {
+      return {
+        field: 'licensePlate',
+        message: uniqueValidation.error!,
+      };
+    }
+
+    // Check maintenance limit if creating with Maintenance status
+    if (status === 'Maintenance') {
+      const maintenanceValidation = canSetToMaintenance(existingVehicles);
+      if (!maintenanceValidation.valid) {
+        return {
+          field: 'status',
+          message: maintenanceValidation.error!,
+        };
+      }
+    }
+
+    return null;
   }
 
-  return null;
+  // Handle batch creation
+  const results: Array<ValidationError | null> = [];
+  const allLicensePlates = new Set<string>(
+    existingVehicles.map((v) => v.licensePlate.toLowerCase())
+  );
+  const newLicensePlates = new Set<string>();
+
+  // Count maintenance vehicles (existing + those being created)
+  let maintenanceCount = existingVehicles.filter(
+    (v) => v.status === 'Maintenance'
+  ).length;
+
+  const totalVehicles = existingVehicles.length + vehiclesToCreate.length;
+  const maxMaintenance = Math.floor(totalVehicles * MAINTENANCE_LIMIT_PERCENTAGE);
+
+  for (const vehicle of vehiclesToCreate) {
+    const status = vehicle.status || 'Available';
+    const licensePlate = vehicle.licensePlate.trim();
+
+    // Validate license plate format
+    const licensePlateValidation = validateLicensePlate(licensePlate);
+    if (!licensePlateValidation.valid) {
+      results.push({
+        field: 'licensePlate',
+        message: licensePlateValidation.error!,
+      });
+      continue;
+    }
+
+    const licensePlateLower = licensePlate.toLowerCase();
+
+    // Check for duplicates with existing vehicles
+    if (allLicensePlates.has(licensePlateLower)) {
+      results.push({
+        field: 'licensePlate',
+        message: `License plate ${licensePlate} already exists`,
+      });
+      continue;
+    }
+
+    // Check for duplicates within the batch
+    if (newLicensePlates.has(licensePlateLower)) {
+      results.push({
+        field: 'licensePlate',
+        message: `Duplicate license plate ${licensePlate} in batch`,
+      });
+      continue;
+    }
+
+    // Check maintenance limit
+    if (status === 'Maintenance') {
+      if (maintenanceCount >= maxMaintenance) {
+        results.push({
+          field: 'status',
+          message: `Cannot exceed 5% maintenance limit (${maintenanceCount} of ${totalVehicles} vehicles already in maintenance, max allowed: ${maxMaintenance})`,
+        });
+        continue;
+      }
+      maintenanceCount++;
+    }
+
+    // All validations passed for this vehicle
+    newLicensePlates.add(licensePlateLower);
+    results.push(null);
+  }
+
+  return results;
 }
 
 /**

@@ -1,5 +1,10 @@
 
-import { Vehicle, VehicleStatus } from '@shared/index';
+import {
+  Vehicle,
+  VehicleStatus,
+  ApiResponse,
+  BatchVehicleResult,
+} from '@shared/index';
 
 const API_URL = 'http://localhost:3001/api';
 
@@ -36,10 +41,29 @@ export const fetchVehicles = async (params: {
   return apiRequest<Vehicle[]>(`${API_URL}/vehicles?${queryParams}`);
 };
 
-export const createVehicle = async (data: {
-  licensePlate: string;
-  status: VehicleStatus;
-}) => {
+/**
+ * Create one or more vehicles
+ * @param data - Single vehicle or array of vehicles to create
+ * @returns Single vehicle or batch response with results
+ */
+export const createVehicles = async (
+  data:
+    | { licensePlate: string; status: VehicleStatus }
+    | Array<{ licensePlate: string; status?: VehicleStatus }>
+): Promise<Vehicle | ApiResponse<Vehicle[]>> => {
+  // Handle batch creation
+  if (Array.isArray(data)) {
+    const response = await fetch(`${API_URL}/vehicles`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ vehicles: data }),
+    });
+
+    const result = await response.json();
+    return result;
+  }
+
+  // Handle single vehicle creation
   return apiRequest<Vehicle>(`${API_URL}/vehicles`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

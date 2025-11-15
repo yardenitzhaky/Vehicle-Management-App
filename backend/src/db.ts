@@ -34,12 +34,27 @@ export async function writeVehicles(vehicles: Vehicle[]): Promise<void> {
 }
 
 /**
- * Generate a unique ID for a new vehicle
+ * Generate unique ID(s) for new vehicle(s)
+ * @param vehicles - Existing vehicles array
+ * @param count - Number of IDs to generate (defaults to 1)
+ * @returns Single ID string if count is 1, otherwise array of ID strings
  */
-export function generateId(vehicles: Vehicle[]): string {
+export function generateIds(
+  vehicles: Vehicle[],
+  count: number = 1
+): string | string[] {
   const maxId = vehicles.reduce((max, vehicle) => {
     const id = parseInt(vehicle.id, 10);
     return !isNaN(id) && id > max ? id : max;
   }, 0);
-  return (maxId + 1).toString();
+
+  if (count === 1) {
+    return (maxId + 1).toString();
+  }
+
+  const ids: string[] = [];
+  for (let i = 1; i <= count; i++) {
+    ids.push((maxId + i).toString());
+  }
+  return ids;
 }

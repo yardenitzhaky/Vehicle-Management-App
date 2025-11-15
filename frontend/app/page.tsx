@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Vehicle, VehicleStatus } from '@shared/index';
 import VehicleTable from '@/components/VehicleTable';
 import VehicleForm from '@/components/VehicleForm';
+import BatchVehicleForm from '@/components/BatchVehicleForm';
 import DeleteConfirmation from '@/components/DeleteConfirmation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StatBox } from '@/components/StatBox';
@@ -24,7 +25,7 @@ export default function Home() {
     sortBy,
     sortOrder,
     handleSort,
-    createVehicle,
+    createVehicles,
     updateVehicle,
     deleteVehicle,
     stats,
@@ -32,6 +33,7 @@ export default function Home() {
 
   // Form state
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isBatchFormOpen, setIsBatchFormOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -66,7 +68,7 @@ export default function Home() {
       if (isEditing && editingVehicle) {
         await updateVehicle(editingVehicle.id, data);
       } else {
-        await createVehicle(data);
+        await createVehicles(data);
       }
       setIsFormOpen(false);
       setEditingVehicle(undefined);
@@ -188,6 +190,25 @@ export default function Home() {
                 Export CSV
               </button>
               <button
+                onClick={() => setIsBatchFormOpen(true)}
+                className="w-full sm:w-auto px-4 py-2 bg-purple-600 text-white rounded-md shadow-sm hover:bg-purple-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center justify-center transition-all duration-200 transform hover:scale-105"
+              >
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                Add Multiple
+              </button>
+              <button
                 onClick={handleAddVehicle}
                 className="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white rounded-md shadow-sm hover:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 flex items-center justify-center transition-all duration-200 transform hover:scale-105"
               >
@@ -269,6 +290,13 @@ export default function Home() {
         }}
         isSubmitting={isSubmitting}
         vehicles={vehicles} // Pass the vehicles array
+      />
+
+      {/* Batch Vehicle Form Modal */}
+      <BatchVehicleForm
+        isOpen={isBatchFormOpen}
+        onSubmit={(vehicles) => createVehicles(vehicles)}
+        onCancel={() => setIsBatchFormOpen(false)}
       />
 
       {/* Delete Confirmation Modal */}
